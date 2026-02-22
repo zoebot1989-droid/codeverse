@@ -1,26 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --editor-bg: #1e1e1e;
+  --sidebar-bg: #252526;
+  --titlebar-bg: #323233;
+  --statusbar-bg: #007acc;
+  --tab-active: #1e1e1e;
+  --tab-inactive: #2d2d2d;
+  --text-primary: #d4d4d4;
+  --text-secondary: #858585;
+  --accent: #007acc;
+  --border: #3e3e42;
+  --line-highlight: #2a2d2e;
+  --selection: #264f78;
+  --line-number: #858585;
+  --scrollbar: #424242;
+  --scrollbar-hover: #4f4f4f;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Inter', -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-hover);
+}
+
+/* Editor font */
+.editor-font {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+/* Selection */
+.editor-textarea::selection {
+  background: var(--selection);
+}
+
+/* Glow effect for landing */
+.glow {
+  text-shadow: 0 0 20px rgba(0, 122, 204, 0.5), 0 0 40px rgba(0, 122, 204, 0.3);
+}
+
+.glow-subtle {
+  text-shadow: 0 0 10px rgba(0, 122, 204, 0.3);
+}
+
+/* Landing cursor blink */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+.cursor-blink {
+  animation: blink 1s infinite;
+}
+
+/* Terminal cursor */
+@keyframes terminal-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+.terminal-cursor {
+  animation: terminal-blink 0.8s infinite;
 }

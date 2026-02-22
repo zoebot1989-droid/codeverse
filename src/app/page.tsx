@@ -1,65 +1,153 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import IDE from "@/components/IDE";
+
+function Typewriter({ text, delay = 0, speed = 50, onDone }: { text: string; delay?: number; speed?: number; onDone?: () => void }) {
+  const [displayed, setDisplayed] = useState("");
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started) return;
+    if (displayed.length < text.length) {
+      const t = setTimeout(() => setDisplayed(text.slice(0, displayed.length + 1)), speed);
+      return () => clearTimeout(t);
+    } else {
+      onDone?.();
+    }
+  }, [started, displayed, text, speed, onDone]);
+
+  if (!started) return null;
+  return (
+    <span>
+      {displayed}
+      {displayed.length < text.length && <span className="cursor-blink text-blue-400">|</span>}
+    </span>
+  );
+}
 
 export default function Home() {
+  const [phase, setPhase] = useState(0);
+  const [showIDE, setShowIDE] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+
+  if (showIDE) {
+    return <IDE />;
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <AnimatePresence>
+      {!transitioning ? (
+        <motion.div
+          className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center relative overflow-hidden"
+          exit={{ opacity: 0, scale: 1.05 }}
+          transition={{ duration: 0.8 }}
+        >
+          {/* Background grid effect */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute inset-0" style={{
+              backgroundImage: 'linear-gradient(rgba(0,122,204,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0,122,204,0.3) 1px, transparent 1px)',
+              backgroundSize: '50px 50px'
+            }} />
+          </div>
+
+          {/* Radial glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-500/5 blur-[100px]" />
+
+          <div className="relative z-10 text-center max-w-2xl px-8">
+            {/* Phase 0: Hey Sis */}
+            <h1 className="text-6xl md:text-7xl font-bold mb-8 text-white glow">
+              <Typewriter text="Hey Sis 👋" speed={80} onDone={() => setTimeout(() => setPhase(1), 800)} />
+            </h1>
+
+            {/* Phase 1 */}
+            {phase >= 1 && (
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-xl md:text-2xl text-gray-400 mb-6"
+              >
+                <Typewriter
+                  text="Your brother mentioned you weren't too impressed with AI..."
+                  delay={200}
+                  speed={35}
+                  onDone={() => setTimeout(() => setPhase(2), 600)}
+                />
+              </motion.p>
+            )}
+
+            {/* Phase 2 */}
+            {phase >= 2 && (
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-2xl md:text-3xl text-white font-semibold mb-12 glow-subtle"
+              >
+                <Typewriter text="So we built you this." delay={200} speed={45} onDone={() => setTimeout(() => setPhase(3), 400)} />
+              </motion.p>
+            )}
+
+            {/* Phase 3: Button */}
+            {phase >= 3 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, type: "spring" }}
+              >
+                <button
+                  onClick={() => {
+                    setTransitioning(true);
+                    setTimeout(() => setShowIDE(true), 800);
+                  }}
+                  className="group relative px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:scale-105"
+                >
+                  See What AI Built →
+                  <span className="absolute inset-0 rounded-lg bg-blue-400/20 blur-xl group-hover:bg-blue-400/30 transition-all -z-10" />
+                </button>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: phase >= 1 ? 0.4 : 0 }}
+            className="absolute bottom-6 text-sm text-gray-500 text-center px-4"
+          >
+            Built by Zoe (AI) in ~15 minutes. No humans were mass-unemployed in the making of this app. 😘
+          </motion.p>
+
+          {/* Easter egg */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: phase >= 3 ? 0.3 : 0 }}
+            transition={{ delay: 1 }}
+            className="absolute bottom-6 right-6 text-xs text-gray-600 max-w-xs text-right hidden md:block"
+          >
+            P.S. — AI isn&apos;t here to take your job. It&apos;s here to make you mass-dangerous. Use it as a tool, not a threat. 💪
+          </motion.p>
+
+          {/* Mobile warning */}
+          <div className="md:hidden absolute top-4 left-4 right-4 text-center text-xs text-gray-600 bg-gray-900/50 rounded-lg p-2">
+            CodeVerse is best experienced on desktop 💻
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          className="min-h-screen bg-[#0a0a0a]"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }
