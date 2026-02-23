@@ -42,12 +42,10 @@ export default function Home() {
   }
 
   return (
-    <AnimatePresence>
+    <div>
       {!transitioning ? (
-        <motion.div
+        <div
           className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center relative overflow-hidden"
-          exit={{ opacity: 0, scale: 1.05 }}
-          transition={{ duration: 0.8 }}
         >
           {/* Background grid effect */}
           <div className="absolute inset-0 opacity-5">
@@ -104,8 +102,7 @@ export default function Home() {
               >
                 <button
                   onClick={() => {
-                    setTransitioning(true);
-                    setTimeout(() => setShowIDE(true), 800);
+                    setShowIDE(true);
                   }}
                   className="group relative px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:scale-105"
                 >
@@ -139,15 +136,12 @@ export default function Home() {
           <div className="md:hidden absolute top-4 left-4 right-4 text-center text-xs text-gray-600 bg-gray-900/50 rounded-lg p-2">
             CodeVerse is best experienced on desktop 💻
           </div>
-        </motion.div>
+        </div>
       ) : (
-        <motion.div
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-          className="min-h-screen bg-[#0a0a0a]"
-        />
+        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+          <p className="text-white text-xl">Loading IDE...</p>
+        </div>
       )}
-    </AnimatePresence>
+    </div>
   );
 }
